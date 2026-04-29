@@ -95,19 +95,22 @@ async def generate_preview(gopro_list):
         try:
             # Starting port
             port = 8554
-            # Iterate through gopros
+            # Already started gopros
+            started = []
+            # Loop through gopros
             for case in gopro_list:
                 gopro = case[0]
                 view = case[1]
                 # Start streaming
                 await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol("RSTP"))
-                
+                started.append(gopro)
                 print("Starting GoPro: " + view)
+                
                 # Get streaming url and pass it to VLC
-                stream_url = f"rstp://{gopro.ip_address}:{port}"
+                stream_url = f"rtsp://{gopro.ip_address}:{port}"
                 print("Opening stream at: " + stream_url)
                 subprocess.Popen(["vlc", stream_url])
-                port = port + 1; 
+                port = port + 1
             
             input('----- Press ENTER to stop preview. -----')
             # Stop gopro streaming
@@ -120,6 +123,8 @@ async def generate_preview(gopro_list):
 
         except Exception as e:
             print(f"An Error Occured: {e}")
+            for gopro in started:
+                await gopro.http_command.webcam_stop()
     else:
         print("Error: vlc is not installed or added to PATH, Please check the README for instructions")
 #------------------------------------------------------------------------------

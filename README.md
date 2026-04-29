@@ -24,13 +24,14 @@ To use the preview you need vlc
 ```Bash
 winget install VideoLAN/VLC
 ```
+<img src="docs/media/Screenshot 2026-04-28 220222.png" alt="set path demonstration" width="700"/>
+
 To use VLC from the terminal you need to add it to PATH. You can do this by:
 - Opening the start menu and searching "Environment variables"
 - Click the result that says "Edit system environment variables" and then click "Environment Variables"
 - Double click on the variable called PATH and then click "New"
 - Paste "C:\Program Files\VideoLAN\VLC" into the box then click ok.
 - Restart your terminal
-
 Now you can continue your usage as normal.
 ```bash
 # Create Virtual Environment
