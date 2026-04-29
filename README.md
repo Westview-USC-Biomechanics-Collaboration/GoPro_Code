@@ -24,9 +24,10 @@ To use the preview you need vlc
 ```Bash
 winget install VideoLAN/VLC
 ```
+#### To use VLC from the terminal you need to add it to PATH. You can do this by:
+
 <img src="docs/media/Screenshot 2026-04-28 220222.png" alt="set path demonstration" width="700"/>
 
-To use VLC from the terminal you need to add it to PATH. You can do this by:
 - Opening the start menu and searching "Environment variables"
 - Click the result that says "Edit system environment variables" and then click "Environment Variables"
 - Double click on the variable called PATH and then click "New"
@@ -46,4 +47,5 @@ pip install -r requirements.txt
 # Run
 python "GoPro_v3 (withPreview).py"
 ```
-
+## TODO
+- Stream from webcam usb (vlc can play camera with ```vlc dshow:// :dshow-vdev="CAMERA_NAME_HERE"``` You can find camera name from vlc -> media -> open capture device) 

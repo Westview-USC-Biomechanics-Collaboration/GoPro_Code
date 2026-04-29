@@ -106,11 +106,12 @@ async def generate_preview(gopro_list):
                 print(f"Status for {view}: \n {await gopro.http_command.webcam_status()}")
                 started.append(gopro)
                 print("Starting GoPro: " + view)
-                
+                # TODO: add option to open stream in VLC automatically, but for now just print the stream url and let user open it
                 # Get streaming url and pass it to VLC
-                stream_url = f"rtsp://{gopro.ip_address}:{port}"
-                print("Opening stream at: " + stream_url)
-                subprocess.Popen(["vlc", stream_url])
+                #stream_url = f"rtsp://{gopro.ip_address}:{port}"
+                #print("Opening stream at: " + stream_url)
+                #subprocess.Popen(["vlc", stream_url])
+                
             
             input('----- Press ENTER to stop preview. -----')
 
