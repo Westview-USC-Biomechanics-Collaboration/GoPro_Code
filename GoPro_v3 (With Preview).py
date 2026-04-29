@@ -219,6 +219,13 @@ async def main_control(local_folder):
     await get_camera_config(gopro_front)
     #--------------------------------------------------------------------------
 
+    list_gopro_view = [(gopro_top, 'Top'),
+                    (gopro_sideB, 'SideB'),
+                        (gopro_front, 'Front')]
+
+    # Generate preview of the cameras before recording
+    input('Press Enter To Start Preview')
+    await generate_preview(list_gopro_view)
 
     #------------- Loop for recording videos for multiple experiments ---------
     current_experiment = ''
@@ -238,9 +245,6 @@ async def main_control(local_folder):
         # Run the function to record a video
         print('')
         input('Press Enter To Start Recording')
-        list_gopro_view = [(gopro_top, 'Top'),
-                            (gopro_sideB, 'SideB'),
-                             (gopro_front, 'Front')]
         await record_video(list_gopro_view, local_folder, current_experiment)
     #--------------------------------------------------------------------------
 #------------------------------------------------------------------------------
