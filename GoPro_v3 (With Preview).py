@@ -102,7 +102,7 @@ async def generate_preview(gopro_list):
                 gopro = case[0]
                 view = case[1]
                 # Start streaming
-                await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol("RSTP"))
+                await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol("RTSP"))
                 started.append(gopro)
                 print("Starting GoPro: " + view)
                 
