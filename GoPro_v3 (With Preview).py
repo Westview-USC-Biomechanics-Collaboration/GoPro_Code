@@ -102,7 +102,8 @@ async def generate_preview(gopro_list):
                 gopro = case[0]
                 view = case[1]
                 # Start streaming
-                await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol("RTSP"))
+                await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol.RTSP)
+                print(f"Status for {view}: \n {await gopro.http_command.webcam_status()}")
                 started.append(gopro)
                 print("Starting GoPro: " + view)
                 
@@ -110,9 +111,9 @@ async def generate_preview(gopro_list):
                 stream_url = f"rtsp://{gopro.ip_address}:{port}"
                 print("Opening stream at: " + stream_url)
                 subprocess.Popen(["vlc", stream_url])
-                port = port + 1
             
             input('----- Press ENTER to stop preview. -----')
+
             # Stop gopro streaming
             for case in gopro_list:
                 gopro = case[0]
