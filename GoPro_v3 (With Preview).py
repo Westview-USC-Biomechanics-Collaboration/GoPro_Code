@@ -5,6 +5,8 @@
 import asyncio
 import serial
 import serial.tools.list_ports
+import subprocess
+from shutil import which
 import threading
 import numpy as np
 import pandas as pd
@@ -14,6 +16,7 @@ from datetime import datetime
 import os
 from open_gopro import WiredGoPro
 from open_gopro.models import constants
+from open_gopro import models
 
 
 
@@ -83,6 +86,42 @@ async def get_camera_config(gopro):
     print(camera_state.data[constants.settings.SettingId.VIDEO_RESOLUTION].name)
     print(camera_state.data[constants.settings.SettingId.VIDEO_LENS].name)
     print(camera_state.data[constants.settings.SettingId.VIDEO_FRAMING].name)
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+async def generate_preview(gopro_list):
+    # Check if vlc exists
+    if which("vlc") is not None:
+        try:
+            # Starting port
+            port = 8554
+            # Iterate through gopros
+            for case in gopro_list:
+                gopro = case[0]
+                view = case[1]
+                # Start streaming
+                await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol("RSTP"))
+                
+                print("Starting GoPro: " + view)
+                # Get streaming url and pass it to VLC
+                stream_url = f"rstp://{gopro.ip_address}:{port}"
+                print("Opening stream at: " + stream_url)
+                subprocess.Popen(["vlc", stream_url])
+                port = port + 1; 
+            
+            input('----- Press ENTER to stop preview. -----')
+            # Stop gopro streaming
+            for case in gopro_list:
+                gopro = case[0]
+                view = case[1]
+                # Stop streaming
+                await gopro.http_command.webcam_stop()
+                print("Stopping GoPro: " + view)
+
+        except Exception as e:
+            print(f"An Error Occured: {e}")
+    else:
+        print("Error: vlc is not installed or added to PATH, Please check the README for instructions")
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -212,3 +251,4 @@ def entrypoint() -> None:
     asyncio.run(main_control(local_folder))
 
 if __name__ == "__main__":
+    entrypoint()
