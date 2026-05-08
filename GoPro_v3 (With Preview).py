@@ -4,6 +4,7 @@
 """
 import asyncio
 import os
+import threading
 import subprocess
 import sys
 from datetime import datetime
@@ -11,7 +12,6 @@ from open_gopro import WiredGoPro
 from open_gopro.models import constants
 from open_gopro import models
 from shutil import which
-
 
 
 # Create local path for saving video
@@ -83,6 +83,21 @@ async def get_camera_config(gopro):
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
+async def send_keep_alive(gopro_list):
+    while True:
+        for case in gopro_list:
+            gopro = case[0]
+            await gopro.http_command.set_keep_alive()
+            await asyncio.sleep(5)  # Send keep-alive every 5 seconds
+
+def keep_alive_task(gopro_list):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(send_keep_alive(gopro_list))
+    loop.close()
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 async def generate_preview(gopro_list):
     # Check if vlc exists
     if which("vlc") is not None:
@@ -97,7 +112,8 @@ async def generate_preview(gopro_list):
                 view = case[1]
                 # Start streaming
                 print("Starting GoPro: " + view)
-                await gopro.http_command.webcam_start(resolution=models.WebcamResolution.RES_720,port=port, protocol=models.streaming.WebcamProtocol.RTSP)
+                await gopro.http_command.webcam_start(resolution=models.streaming.WebcamResolution.RES_720,port=port, protocol=models.streaming.WebcamProtocol.RTSP)
+                await asyncio.sleep(0.5) 
                 print(f"Status for {view}: \n {await gopro.http_command.webcam_status()}")
                 started.append(gopro)
                 # Get streaming url and pass it to VLC
@@ -222,6 +238,11 @@ async def main_control(local_folder):
                     (gopro_sideB, 'SideB'),
                         (gopro_front, 'Front')]
     
+    print("----- Starting Keep Alive -----")
+    t = threading.Thread(target=keep_alive_task, args=(list_gopro_view,), daemon=True)
+    t.start()
+    t.join()
+
     # Generate preview of the cameras before recording
     input('Press Enter To Start Preview')
     await generate_preview(list_gopro_view)
