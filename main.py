@@ -3,13 +3,6 @@
 
 """
 import asyncio
-import serial
-import serial.tools.list_ports
-import threading
-import numpy as np
-import pandas as pd
-import json
-import time
 from datetime import datetime
 import os
 from open_gopro import WiredGoPro

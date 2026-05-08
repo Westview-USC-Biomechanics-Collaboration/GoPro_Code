@@ -3,20 +3,14 @@
 
 """
 import asyncio
-import serial
-import serial.tools.list_ports
-import subprocess
-from shutil import which
-import threading
-import numpy as np
-import pandas as pd
-import json
-import time
-from datetime import datetime
 import os
+import subprocess
+import sys
+from datetime import datetime
 from open_gopro import WiredGoPro
 from open_gopro.models import constants
 from open_gopro import models
+from shutil import which
 
 
 
@@ -102,18 +96,17 @@ async def generate_preview(gopro_list):
                 gopro = case[0]
                 view = case[1]
                 # Start streaming
-                await gopro.http_command.webcam_start(port=port, protocol=models.WebcamProtocol.RTSP)
+                print("Starting GoPro: " + view)
+                await gopro.http_command.webcam_start(resolution=models.WebcamResolution.RES_720,port=port, protocol=models.streaming.WebcamProtocol.RTSP)
                 print(f"Status for {view}: \n {await gopro.http_command.webcam_status()}")
                 started.append(gopro)
-                print("Starting GoPro: " + view)
-                # TODO: add option to open stream in VLC automatically, but for now just print the stream url and let user open it
                 # Get streaming url and pass it to VLC
-                #stream_url = f"rtsp://{gopro.ip_address}:{port}"
-                #print("Opening stream at: " + stream_url)
-                #subprocess.Popen(["vlc", stream_url])
+                stream_url = f"rtsp://{gopro.ip_address}:{port}/live"
+                print("Opening stream at: " + stream_url)
+                subprocess.Popen(["vlc", stream_url])
                 
             
-            input('----- Press ENTER to stop preview. -----')
+            input('----- Press ENTER to stop preview. DO NOT PRESS CTRL+C until you stop the preview. -----')
 
             # Stop gopro streaming
             for case in gopro_list:
@@ -181,9 +174,8 @@ async def record_video(gopro_list, local_folder, current_experiment):
 #------------------ Main Control for Recording Videos -------------------------
 async def main_control(local_folder):
     #-- Allow user to update the local folder path and camera serian numbers --
-    print('')
-    print('--------- STARTING GOPRO CONTROL SCRIPT -----------------')
-    print('')
+    print('\n--------- STARTING GOPRO CONTROL SCRIPT -----------------\n')
+    print('Press CTRL + C twice to quit.')
     print('Current local folder path is: ' + local_folder)
     new_local_folder = input('Provide new local folder path, or hit ENTER to use current path: ')
     print(new_local_folder)
@@ -229,7 +221,7 @@ async def main_control(local_folder):
     list_gopro_view = [(gopro_top, 'Top'),
                     (gopro_sideB, 'SideB'),
                         (gopro_front, 'Front')]
-
+    
     # Generate preview of the cameras before recording
     input('Press Enter To Start Preview')
     await generate_preview(list_gopro_view)
@@ -239,10 +231,8 @@ async def main_control(local_folder):
     while True:
         # Determine if quitting or experiment name needs updating
         print('Current Experiment = ' + current_experiment)
-        new_experiment = input('Provide experiment name (Enter to keep current name), or q to quit: ')
+        new_experiment = input('Provide experiment name (Enter to keep current name), or CTRL + C to quit: ')
         print(new_experiment)
-        if new_experiment == 'q':
-            break
         if new_experiment != '':
             current_experiment = new_experiment
 
@@ -262,4 +252,11 @@ def entrypoint() -> None:
     asyncio.run(main_control(local_folder))
 
 if __name__ == "__main__":
-    entrypoint()
+    try: 
+        entrypoint()
+    except KeyboardInterrupt:
+        print('\n Script interrupted by user. Exiting...')
+        sys.exit(0)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        sys.exit(1)
