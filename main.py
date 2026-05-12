@@ -8,7 +8,10 @@ import os
 from open_gopro import WiredGoPro
 from open_gopro.models import constants
 
-
+# Enabled Cameras
+front_enabled = True
+top_enabled = True
+side_enabled = True
 
 # Create local path for saving video
 local_folder = r"C:\GoPro_Downloads"
@@ -137,22 +140,25 @@ async def main_control(local_folder):
     if new_local_folder != '':
         local_folder = new_local_folder
     print('')
-    print('Current Front View SN is: ' + dict_cameras['Front'])
-    new_front_sn = input('Provide Front View SN, or hit ENTER to use current SN: ')
-    print(new_front_sn)
-    if new_front_sn != '':
-        dict_cameras['Front'] = new_front_sn
-    print('Current Top View SN is: ' + dict_cameras['Top'])
-    new_top_sn = input('Provide Top View SN, or hit ENTER to use current SN: ')
-    print(new_top_sn)
-    if new_top_sn != '':
-        dict_cameras['Top'] = new_top_sn
-    print('Current Side View SN is: ' + dict_cameras['SideB'])
-    new_side_sn = input('Provide Side View SN, or hit ENTER to use current SN: ')
-    print(new_side_sn)
-    if new_side_sn != '':
-        dict_cameras['SideA'] = new_side_sn
-        dict_cameras['SideB'] = new_side_sn
+    if front_enabled
+        print('Current Front View SN is: ' + dict_cameras['Front'])
+        new_front_sn = input('Provide Front View SN, or hit ENTER to use current SN: ')
+        print(new_front_sn)
+        if new_front_sn != '':
+            dict_cameras['Front'] = new_front_sn
+    if top_enabled:
+        print('Current Top View SN is: ' + dict_cameras['Top'])
+        new_top_sn = input('Provide Top View SN, or hit ENTER to use current SN: ')
+        print(new_top_sn)
+        if new_top_sn != '':
+            dict_cameras['Top'] = new_top_sn
+    if side_enabled:
+        print('Current Side View SN is: ' + dict_cameras['SideB'])
+        new_side_sn = input('Provide Side View SN, or hit ENTER to use current SN: ')
+        print(new_side_sn)
+        if new_side_sn != '':
+            dict_cameras['SideA'] = new_side_sn
+            dict_cameras['SideB'] = new_side_sn
 
     #------- Connect to the cameras and show the info and config settings -----
     gopro_front = await front_view_camera(dict_cameras['Front'])
