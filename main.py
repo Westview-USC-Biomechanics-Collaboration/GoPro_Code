@@ -140,7 +140,7 @@ async def main_control(local_folder):
     if new_local_folder != '':
         local_folder = new_local_folder
     print('')
-    if front_enabled
+    if front_enabled:
         print('Current Front View SN is: ' + dict_cameras['Front'])
         new_front_sn = input('Provide Front View SN, or hit ENTER to use current SN: ')
         print(new_front_sn)
