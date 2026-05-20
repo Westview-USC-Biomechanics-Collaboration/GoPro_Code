@@ -103,23 +103,22 @@ def keep_alive_task(gopro_list):
 
 #------------------------------------------------------------------------------
 async def generate_preview(gopro_list):
-    # Check if vlc exists
-    if which("vlc") is not None:
+    ready = False
+    while not ready:
         for gopro in gopro_list:
             camera = gopro[0]
             view = gopro[1]
 
-            await gopro.set_shutter(shutter=constants.Toggle.ENABLE)
+            await camera.http_command.set_shutter(shutter=constants.Toggle.ENABLE)
             await asyncio.sleep(0.3)
-            await gopro.http_command.set_shutter(shutter=constants.Toggle.DISABLE)
+            await camera.http_command.set_shutter(shutter=constants.Toggle.DISABLE)
 
-            video = await gopro.http_command.get_last_captured_media()
+            video = await camera.http_command.get_last_captured_media()
             print("Opened Preview for " + view)
-            webbrowser.open(f"http://{gopro.ip_address}:8080//videos/DCIM/100GOPRO/{video.data.file}")
-            
+            webbrowser.open(f"http://{camera.ip_address}:8080//videos/DCIM/100GOPRO/{video.data.file}")
 
-    else:
-        print("Error: vlc is not installed or added to PATH, Please check the README for instructions")
+            if input("Would you like to see the preview again (y/n)? ") == "y":
+                ready = False
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -238,8 +237,8 @@ async def main_control(local_folder):
     """
 
     # Generate preview of the cameras before recording
-    input('Press Enter To Start Preview')
-    await generate_preview(list_gopro_view)
+    if input("Would you like to see the preview (y/n)? ") == "y":
+        await generate_preview(list_gopro_view)
 
     #------------- Loop for recording videos for multiple experiments ---------
     current_experiment = ''
