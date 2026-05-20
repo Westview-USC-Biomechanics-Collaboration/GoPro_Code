@@ -4,8 +4,7 @@
 """
 import asyncio
 import os
-import threading
-import subprocess
+import webbrowser
 import sys
 from datetime import datetime
 from open_gopro import WiredGoPro
@@ -106,41 +105,19 @@ def keep_alive_task(gopro_list):
 async def generate_preview(gopro_list):
     # Check if vlc exists
     if which("vlc") is not None:
-        try:
-            # starting port
-            port = 8554
-            # Already started gopros
-            started = []
-            # Loop through gopros
-            for case in gopro_list:
-                gopro = case[0]
-                view = case[1]
-                # Start streaming
-                print("Starting GoPro: " + view)
-                await gopro.http_command.webcam_start(resolution=models.streaming.WebcamResolution.RES_720)
-                await asyncio.sleep(0.5) 
-                print(f"Status for {view}: \n {await gopro.http_command.webcam_status()}")
-                started.append(gopro)
-                # Get streaming url and pass it to VLC
-                stream_url = f"udp://@0.0.0.0:{port}"
-                print("Opening stream at: " + stream_url)
-                subprocess.Popen(["vlc", stream_url])
-                port += 1  # Increment port for next GoPro
+        for gopro in gopro_list:
+            camera = gopro[0]
+            view = gopro[1]
 
-            input('----- Press ENTER to stop preview. DO NOT PRESS CTRL+C until you stop the preview. -----')
+            await gopro.set_shutter(shutter=constants.Toggle.ENABLE)
+            await asyncio.sleep(0.3)
+            await gopro.http_command.set_shutter(shutter=constants.Toggle.DISABLE)
 
-            # Stop gopro streaming
-            for case in gopro_list:
-                gopro = case[0]
-                view = case[1]
-                # Stop streaming
-                await gopro.http_command.webcam_stop()
-                print("Stopping GoPro: " + view)
+            video = await gopro.http_command.get_last_captured_media()
+            print("Opened Preview for " + view)
+            webbrowser.open(f"http://{gopro.ip_address}:8080//videos/DCIM/100GOPRO/{video.data.file}")
+            
 
-        except Exception as e:
-            print(f"An Error Occured: {e}")
-            for gopro in started:
-                await gopro.http_command.webcam_stop()
     else:
         print("Error: vlc is not installed or added to PATH, Please check the README for instructions")
 #------------------------------------------------------------------------------
