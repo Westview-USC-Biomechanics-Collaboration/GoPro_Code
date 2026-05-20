@@ -238,6 +238,7 @@ async def main_control(local_folder):
 
     # Generate preview of the cameras before recording
     if input("Would you like to see the preview (y/n)? ") == "y":
+        input('Press Enter To Start Preview')
         await generate_preview(list_gopro_view)
 
     #------------- Loop for recording videos for multiple experiments ---------
