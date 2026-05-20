@@ -117,7 +117,7 @@ async def generate_preview(gopro_list):
             print("Opened Preview for " + view)
             webbrowser.open(f"http://{camera.ip_address}:8080//videos/DCIM/100GOPRO/{video.data.file}")
 
-        if input("Would you like to see the preview again (y/n)? ") == "y":
+        if input("Would you like to see the preview again (y/n)? ") == "n":
             ready = False
 #------------------------------------------------------------------------------
 
