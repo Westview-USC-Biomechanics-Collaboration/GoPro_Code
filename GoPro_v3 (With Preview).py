@@ -103,8 +103,8 @@ def keep_alive_task(gopro_list):
 
 #------------------------------------------------------------------------------
 async def generate_preview(gopro_list):
-    ready = False
-    while not ready:
+    ready = True
+    while ready:
         for gopro in gopro_list:
             camera = gopro[0]
             view = gopro[1]
