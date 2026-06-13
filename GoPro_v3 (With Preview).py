@@ -226,8 +226,9 @@ async def main_control(local_folder):
         await get_camera_config(gopro_front)
     #--------------------------------------------------------------------------
     # TODO: add enable functionality
+    short_camera_side = input("Which side is the short camera on? (A/B): ")
     list_gopro_view = [(gopro_top, 'Top'),
-                    (gopro_sideB, 'SideB'),
+                    (gopro_sideB, f'Side{short_camera_side}'),
                         (gopro_front, 'Front')]
     """
     print("----- Starting Keep Alive -----")
